@@ -16,7 +16,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "PAYMENT")
 public class Payment extends BaseEntity {
 
     @Id

@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.devon.flashsale.constants.GlobalConstants;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -19,14 +21,14 @@ public class BaseEntity {
     protected LocalDateTime createdAt;
 
     @Column(name = "created_by", nullable = false, updatable = false)
-    protected String createdBy;
+    protected String createdBy = GlobalConstants.CREATED_BY;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     protected LocalDateTime updatedAt;
 
     @Column(name = "updated_by", nullable = false)
-    protected String updatedBy;
+    protected String updatedBy=GlobalConstants.UPDATED_BY;
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;

@@ -19,7 +19,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "ORDERS")
 public class Order extends BaseEntity {
 
     @Id
@@ -40,7 +40,7 @@ public class Order extends BaseEntity {
     @Column(name = "correlation_id")
     private String correlationId;
 
-    @Column(name = "expires_at", nullable = false)
+    @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
     @Column(name = "error_message")
