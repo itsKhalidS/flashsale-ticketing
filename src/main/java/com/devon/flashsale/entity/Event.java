@@ -6,6 +6,7 @@ import java.util.List;
 import com.devon.flashsale.enums.EventStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,7 +54,7 @@ public class Event extends BaseEntity {
     @Column(name = "status", nullable = false)
     private EventStatus status;  // ACTIVE, CLOSED, CANCELLED
 
-    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Order> orders;
 
 	public Long getEventId() {
