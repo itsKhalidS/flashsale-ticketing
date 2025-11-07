@@ -3,6 +3,7 @@ package com.devon.flashsale.service;
 import java.util.List;
 
 import com.devon.flashsale.entity.Event;
+import com.devon.flashsale.enums.EventStatus;
 
 public interface EventService {
 	
@@ -11,4 +12,6 @@ public interface EventService {
 	public List<Event> getAllEvents();
 	
 	public Event getEventById(Long eventId);
+	
+	public int updateEventStatus(Long eventId, EventStatus status);
 }

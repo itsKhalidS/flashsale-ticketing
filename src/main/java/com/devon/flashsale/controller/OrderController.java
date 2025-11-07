@@ -38,7 +38,7 @@ public class OrderController {
 	@ResponseBody
 	public List<Order> fetchAllOrders(){
 		log.info("Fetching all orders");
-		return orderService.fetchAllOrders();
+		return orderService.getAllOrders();
 	}
 	
 	@GetMapping("/{id}")

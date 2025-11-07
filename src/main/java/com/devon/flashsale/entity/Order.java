@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -49,6 +50,10 @@ public class Order extends BaseEntity {
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private Payment payment;
+    
+    @Version
+    @Column(name = "version")
+    private Long version;
 
 	public Long getOrderId() {
 		return orderId;

@@ -25,6 +25,8 @@ public class LoggingFilter extends OncePerRequestFilter {
 
         MDC.put("correlationId", correlationId);
 
+        response.setHeader("X-Correlation-Id", correlationId);
+        
         try {
             filterChain.doFilter(request, response);
         } finally {
