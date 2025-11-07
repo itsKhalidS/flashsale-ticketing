@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.devon.flashsale.enums.EventStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,9 +17,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "EVENT")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "orders"})
 public class Event extends BaseEntity {
 	
 	@Id
@@ -28,6 +30,7 @@ public class Event extends BaseEntity {
     private Long eventId;
 
     @Column(name = "event_name", nullable = false)
+    @Size(max = 255, message = "Event name length exceeded")
     private String eventName;
 
     @Column(name = "total_seats", nullable = false)
@@ -50,7 +53,7 @@ public class Event extends BaseEntity {
     @Column(name = "status", nullable = false)
     private EventStatus status;  // ACTIVE, CLOSED, CANCELLED
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     private List<Order> orders;
 
 	public Long getEventId() {

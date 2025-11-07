@@ -2,6 +2,8 @@ package com.devon.flashsale.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.devon.flashsale.entity.Event;
@@ -12,7 +14,7 @@ import com.devon.flashsale.service.EventService;
 @Service
 public class EventServiceImpl implements EventService {
 
-	
+	private static final Logger log = LoggerFactory.getLogger(EventServiceImpl.class);
 	private final EventRepository eventRepository;
 	
 	public EventServiceImpl(EventRepository eventRepository) {
@@ -21,7 +23,9 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	public Event createEvent(Event event) {
-		return eventRepository.save(event);
+		Event savedEvent = eventRepository.save(event);
+		log.info("Event with Event Id: {} created", savedEvent.getEventId());
+		return savedEvent;
 	}
 
 	@Override
@@ -31,8 +35,10 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public Event getEventById(Long eventId) {
-		return eventRepository.findById(eventId)
+		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new ResourceNotFoundException("No Event Found for id ["+eventId+"]") );
+		log.info("Event with Event Id: {} found", event.getEventId());
+		return event;
 	}
 
 }

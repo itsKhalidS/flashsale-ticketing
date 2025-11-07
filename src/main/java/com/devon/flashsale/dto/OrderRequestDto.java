@@ -1,11 +1,14 @@
 package com.devon.flashsale.dto;
 
+import jakarta.validation.constraints.Size;
+
 public class OrderRequestDto {
 
 	Long eventId;
 	
 	int quantity;
 	
+    @Size(max=100, message = "Idempotency Key length exceeded")
 	String idempotencyKey;
 
 	public Long getEventId() {

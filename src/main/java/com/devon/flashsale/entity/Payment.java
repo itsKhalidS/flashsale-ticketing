@@ -1,7 +1,7 @@
 package com.devon.flashsale.entity;
 
-import com.devon.flashsale.enums.PaymentMode;
 import com.devon.flashsale.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,9 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "PAYMENT")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "order"})
 public class Payment extends BaseEntity {
 
     @Id
@@ -29,21 +31,15 @@ public class Payment extends BaseEntity {
     private Order order;
 
     @Column(name = "payment_reference", nullable = false, unique = true)
+    @Size(max=100, message = "Payment Reference length exceeded")
     private String paymentReference;
 
     @Column(name = "amount", nullable = false)
     private Double amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_mode", nullable = false)
-    private PaymentMode paymentMode; // CARD, UPI, NETBANKING, WALLET etc.
-
-    @Column(name = "card_last4")
-    private String cardLast4;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private PaymentStatus status; // INITIATED, SUCCESS, FAILED, REFUNDED
+    private PaymentStatus status; // SUCCESS, FAILED, REFUNDED
 
 	public Long getPaymentId() {
 		return paymentId;
@@ -75,22 +71,6 @@ public class Payment extends BaseEntity {
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
-	}
-
-	public PaymentMode getPaymentMode() {
-		return paymentMode;
-	}
-
-	public void setPaymentMode(PaymentMode paymentMode) {
-		this.paymentMode = paymentMode;
-	}
-
-	public String getCardLast4() {
-		return cardLast4;
-	}
-
-	public void setCardLast4(String cardLast4) {
-		this.cardLast4 = cardLast4;
 	}
 
 	public PaymentStatus getStatus() {
