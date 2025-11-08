@@ -2,6 +2,9 @@ package com.devon.flashsale.dto;
 
 import jakarta.validation.constraints.Size;
 
+/**
+ * DTO class containing order creation details. Used to map incoming <code>/order/create</code> requests
+ */
 public class OrderRequestDto {
 
 	Long eventId;

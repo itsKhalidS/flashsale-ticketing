@@ -12,6 +12,10 @@ import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.enums.OrderStatus;
 import com.devon.flashsale.service.OrderService;
 
+/**
+ * Scheduler class : Runs in background and updates Order Status of expired PENDING orders.
+ * Restores seats for the Event against which the order was PENDING.
+ */
 @Component
 public class OrderScheduler {
 

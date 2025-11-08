@@ -31,6 +31,9 @@ public class EventController {
 		this.eventService = eventService;
 	}
 
+	/**
+	 * @return The List of all events
+	 */
 	@GetMapping
 	@ResponseBody
 	public List<Event> fetchAllEvents() {
@@ -38,6 +41,10 @@ public class EventController {
 		return eventService.getAllEvents();
 	}
 
+	/**
+	 * @param event : The event to create
+	 * @return The created event
+	 */
 	@PostMapping("/create")
 	@ResponseBody
 	public Event createNewEvent(@RequestBody @Valid Event event) {
@@ -49,6 +56,10 @@ public class EventController {
 		return eventService.createEvent(event);
 	}
 	
+	/**
+	 * @param id : The eventId
+	 * @return The event fetched
+	 */
 	@GetMapping("/{id}")
 	@ResponseBody
 	public Event fetchEventById(@PathVariable Long id) {

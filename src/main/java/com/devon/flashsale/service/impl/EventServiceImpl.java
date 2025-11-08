@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
 	public int updateEventStatus(Long eventId, EventStatus status) {
 		int rowEffected = eventRepository.updateEventStatus(eventId, status);
 		if(rowEffected == 1)
-			log.info("Status updated to [{}] for Event with Event Id: {} found", status, eventId);
+			log.info("Status updated to [{}] for Event with Event Id: {}", status, eventId);
 		return rowEffected;
 	}
 

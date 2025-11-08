@@ -2,6 +2,9 @@ package com.devon.flashsale.dto;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO class for sending error responses to the caller
+ */
 public class ErrorResponseDto {
 	
 	private int status;

@@ -12,6 +12,9 @@ import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.service.EventService;
 
+/**
+ * Scheduler class : Runs in background and updates Event Status of ACTIVE and CLOSED events
+ */
 @Component
 public class EventScheduler {
 

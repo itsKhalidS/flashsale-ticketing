@@ -10,8 +10,16 @@ import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.exceptions.ValidationException;
 
+/**
+ * Helper class to help in Order Validation
+ */
 public class OrderValidator {
 	
+	/**
+	 * Validates an incoming Order Request
+	 * @param orderRequest : The order request object
+	 * @return The List of errors
+	 */
 	public static List<FlashSaleAppException> validateNewOrder(OrderRequestDto orderRequest){
 		List<FlashSaleAppException> exceptions = new ArrayList<>();
 		
@@ -26,6 +34,11 @@ public class OrderValidator {
 		return exceptions;
 	}
 
+	/**
+	 * Validates an incoming Payment Request
+	 * @param paymentRequest : The payment request object
+	 * @return The List of errors
+	 */
 	public static List<FlashSaleAppException> validatePaymentRequest(PaymentRequestDto paymentRequest) {
 		List<FlashSaleAppException> exceptions = new ArrayList<>();
 		

@@ -34,6 +34,9 @@ public class OrderController {
 		this.orderService = orderService;
 	}
 	
+	/**
+	 * @return The List of all Orders
+	 */
 	@GetMapping
 	@ResponseBody
 	public List<Order> fetchAllOrders(){
@@ -41,6 +44,10 @@ public class OrderController {
 		return orderService.getAllOrders();
 	}
 	
+	/**
+	 * @param id : The orderId
+	 * @return The Order fetched
+	 */
 	@GetMapping("/{id}")
 	@ResponseBody
     public Order fetchOrderById(@PathVariable Long id) {
@@ -48,6 +55,10 @@ public class OrderController {
         return orderService.getOrderById(id);
     }
 
+	/**
+	 * @param orderRequest : The OrderRequestDto
+	 * @return : The order created
+	 */
 	@PostMapping("/create")
 	@ResponseBody
 	public Order createNewOrder(@RequestBody @Valid OrderRequestDto orderRequest) {
@@ -59,6 +70,11 @@ public class OrderController {
 		return orderService.createOrder(orderRequest.getEventId(), orderRequest.getQuantity(), orderRequest.getIdempotencyKey());
 	}
 	
+	/**
+	 * @param orderId : The Order Id
+	 * @param paymentRequest : The PaymentRequestDto
+	 * @return The Order confirmed
+	 */
 	@PutMapping("/{orderId}/confirm")
 	@ResponseBody
     public Order confirmOrder(@PathVariable Long orderId, @RequestBody @Valid PaymentRequestDto paymentRequest) {
@@ -72,6 +88,10 @@ public class OrderController {
         
     }
 	
+	/**
+	 * @param orderId : The Order Id
+	 * @return The cancelled Order
+	 */
 	@PutMapping("/{orderId}/cancel")
 	@ResponseBody
     public Order cancelOrder(@PathVariable Long orderId) {

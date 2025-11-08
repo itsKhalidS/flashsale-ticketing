@@ -28,14 +28,30 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 							         " SET evt.status = :status "+
 							         "   WHERE evt.eventId = :eventId ";
 
+	/** Increase the seats remaining for the particular event
+	 * @param eventId : The eventId of the event
+	 * @param quantity : The number of seats to increase
+	 * @return The number of rows effected
+	 */
 	@Modifying
 	@Query(incrementQuery)
 	int incrementSeats(@Param("eventId") Long eventId, @Param("quantity") Integer quantity);
 	
+	/**
+	 * Decrease the remaining seats for the particular event
+	 * @param eventId : The eventId of the event
+	 * @param quantity : The number of seats to decrease
+	 * @return The number of rows effected
+	 */
 	@Modifying
 	@Query(decrementQuery)
 	int decrementSeatsIfAvailable(@Param("eventId") Long eventId, @Param("quantity") Integer quantity);
 	
+	/** Update the status of a particular event
+	 * @param eventId : The eventId of the event
+	 * @param status : The updated status
+	 * @return The number of rows effected
+	 */
 	@Modifying
 	@Query(statusUpdateQuery)
 	int updateEventStatus(@Param("eventId") Long eventId, @Param("status") EventStatus status);

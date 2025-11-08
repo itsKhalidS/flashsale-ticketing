@@ -12,6 +12,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class AuditConfig {
 	
 	public static final String CURRENT_USER = "SYSTEM";
+	
+	/**
+	 * @return the CURRENT_USER(i.e. SYSTEM)
+	 */
     @Bean
     public AuditorAware<String> auditorProvider() {
         return () -> Optional.of(CURRENT_USER);

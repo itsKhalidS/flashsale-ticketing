@@ -16,6 +16,9 @@ import com.devon.flashsale.exceptions.ResourceNotFoundException;
 import com.devon.flashsale.exceptions.SaleWindowClosedException;
 import com.devon.flashsale.exceptions.ValidationException;
 
+/**
+ * A Global Exception handler defined to catch all Exceptions.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	

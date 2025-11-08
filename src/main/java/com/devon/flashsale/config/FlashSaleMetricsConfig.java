@@ -20,10 +20,16 @@ public class FlashSaleMetricsConfig {
                 .register(registry);
     }
 
+    /**
+     * Method to update <code>orders.created</code> monitoring metric
+     */
     public void incrementOrdersCreated() {
         ordersCreatedCounter.increment();
     }
 
+    /**
+     * Method to update <code>optimistic.lock.retries</code> monitoring metric
+     */
     public void incrementOptimisticLockRetries() {
         optimisticLockRetriesCounter.increment();
     }

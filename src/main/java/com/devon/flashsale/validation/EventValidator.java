@@ -11,8 +11,16 @@ import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.exceptions.ValidationException;
 
+/**
+ * Helper class to help in Event Validation
+ */
 public class EventValidator {
 
+	/**
+	 * Validates an incoming Event Object
+	 * @param event : The event object
+	 * @return The List of errors
+	 */
 	public static List<FlashSaleAppException> validateNewEvent(Event event){
 		List<FlashSaleAppException> exceptions = new ArrayList<>();
 		
