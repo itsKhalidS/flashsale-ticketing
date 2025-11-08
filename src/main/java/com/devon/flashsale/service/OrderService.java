@@ -22,7 +22,9 @@ public interface OrderService {
 
 	public Order getOrderById(Long id);
 	
-	public void updatePendingOrder(Order order, OrderStatus status);
+	public void expirePendingOrder(Order order);
+	
+	public void expirePendingOrderWithoutOptimisticLock(Order order);
 	
 	public List<Order> getAllOrdersByStatus(OrderStatus status);
 }

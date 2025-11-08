@@ -322,13 +322,62 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Override
 	@Transactional
-	public void updatePendingOrder(Order order, OrderStatus status) {
-		order.setStatus(status);
+	public void expirePendingOrder(Order order) {
+		
+		Event event;
+		int attempt=0;
+		boolean success=false;
+		while(attempt < MAX_ATTEMPTS) {
+			try {
+				attempt++;	
+				
+				event = eventRepository.findById(order.getEvent().getEventId())
+						.orElseThrow(()-> new ResourceNotFoundException("No Event Found for id ["+order.getEvent().getEventId()+"]"));
+				
+				event.setRemainingSeats(event.getRemainingSeats() + order.getQty());
+				eventRepository.save(event);
+				success=true;
+				log.info("Event with Event Id: {} updated", event.getEventId());
+				break;
+				
+			} catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+				if(attempt < MAX_ATTEMPTS) {
+					log.error("OptimisticLockException encountered. Trying again");
+					flashSaleMetricsConfig.incrementOptimisticLockRetries();
+				}
+			}
+		}
+		if(!success) {
+			log.error("Failed in expiring order with OrderId: ["+order.getOrderId()+"]");
+			return;
+		}
+		
+		order.setStatus(OrderStatus.EXPIRED);
 		try {
 			orderRepository.save(order);
-			log.info("Status updated to [{}] for Order with Order Id: {} found", status, order.getOrderId());
+			log.info("Status updated to [{}] for Order with Order Id: {}", OrderStatus.EXPIRED, order.getOrderId());
 		}catch(ObjectOptimisticLockingFailureException | OptimisticLockException e) {
-			log.error("Failed in  expiring order with OrderId: ["+order.getOrderId()+"]");
+			log.error("Failed in expiring order with OrderId: ["+order.getOrderId()+"]");
+		}
+	}
+	
+	@Override
+	@Transactional
+	public void expirePendingOrderWithoutOptimisticLock(Order order) {
+		Event event = order.getEvent();
+		int rowsEffected = eventRepository.incrementSeats(event.getEventId(), order.getQty());
+		if(rowsEffected == 0) {
+			log.error("Failed in expiring order with OrderId: ["+order.getOrderId()+"]");
+			return;
+		}
+		log.info("Event with Event Id: {} updated", event.getEventId());
+		
+		order.setStatus(OrderStatus.EXPIRED);
+		try {
+			orderRepository.save(order);
+			log.info("Status updated to [{}] for Order with Order Id: {}", OrderStatus.EXPIRED, order.getOrderId());
+		}catch(ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+			log.error("Failed in expiring order with OrderId: ["+order.getOrderId()+"]");
 		}
 	}
 

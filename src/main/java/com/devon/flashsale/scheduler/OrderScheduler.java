@@ -30,7 +30,7 @@ public class OrderScheduler {
 		for(Order order: orders) {
 			LocalDateTime currentDateTime = LocalDateTime.now();
 			if(currentDateTime.isAfter(order.getExpiresAt())) {
-				orderService.updatePendingOrder(order, OrderStatus.EXPIRED);
+				orderService.expirePendingOrder(order);
 			}
 		}
 		log.info("Ending scheduled Order Status updation");
