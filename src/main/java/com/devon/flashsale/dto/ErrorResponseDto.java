@@ -1,6 +1,8 @@
 package com.devon.flashsale.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO class for sending error responses to the caller
@@ -11,12 +13,19 @@ public class ErrorResponseDto {
 	
 	private String timestamp;
 	
-	private String errorMessage;
+	private List<String> exceptions;
 	
 	public ErrorResponseDto(int status, String errorMessage) {
 		this.status = status;
 		this.timestamp = LocalDateTime.now().toString();
-		this.errorMessage = errorMessage;
+		this.exceptions = new ArrayList<>();
+		exceptions.add(errorMessage);
+	}
+	
+	public ErrorResponseDto(int status, List<String> exceptions) {
+		this.status = status;
+		this.timestamp = LocalDateTime.now().toString();
+		this.exceptions = exceptions;
 	}
 
 	public int getStatus() {
@@ -35,11 +44,12 @@ public class ErrorResponseDto {
 		this.timestamp = timestamp;
 	}
 
-	public String getErrorMessage() {
-		return errorMessage;
+	public List<String> getExceptions() {
+		return exceptions;
 	}
 
-	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
+	public void setExceptions(List<String> exceptions) {
+		this.exceptions = exceptions;
 	}
+
 }

@@ -33,6 +33,10 @@ public class Order extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "qty", nullable = false)
     private Integer qty;
@@ -50,6 +54,9 @@ public class Order extends BaseEntity {
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private Payment payment;
+    
+    @Column(name = "ticket_number", unique = true)
+    private String ticketNumber;
     
     @Version
     @Column(name = "version")
@@ -69,6 +76,14 @@ public class Order extends BaseEntity {
 
 	public void setEvent(Event event) {
 		this.event = event;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Integer getQty() {
@@ -109,6 +124,14 @@ public class Order extends BaseEntity {
 
 	public void setPayment(Payment payment) {
 		this.payment = payment;
+	}
+
+	public String getTicketNumber() {
+		return ticketNumber;
+	}
+
+	public void setTicketNumber(String ticketNumber) {
+		this.ticketNumber = ticketNumber;
 	}
     
 }

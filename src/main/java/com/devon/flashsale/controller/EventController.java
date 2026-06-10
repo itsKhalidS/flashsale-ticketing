@@ -40,6 +40,17 @@ public class EventController {
 		log.info("Fetching all events");
 		return eventService.getAllEvents();
 	}
+	
+	/**
+	 * @param id : The eventId
+	 * @return The event fetched
+	 */
+	@GetMapping("/{id}")
+	@ResponseBody
+	public Event fetchEventById(@PathVariable Long id) {
+		log.info("Fetching event with EventId: {}", id);
+		return eventService.getEventById(id);
+	}
 
 	/**
 	 * @param event : The event to create
@@ -54,16 +65,5 @@ public class EventController {
 			throw exceptions.get(0);
 		}
 		return eventService.createEvent(event);
-	}
-	
-	/**
-	 * @param id : The eventId
-	 * @return The event fetched
-	 */
-	@GetMapping("/{id}")
-	@ResponseBody
-	public Event fetchEventById(@PathVariable Long id) {
-		log.info("Fetching event with EventId: {}", id);
-		return eventService.getEventById(id);
 	}
 }

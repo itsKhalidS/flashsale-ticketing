@@ -22,7 +22,9 @@ public class EventValidator {
 	 * @return The List of errors
 	 */
 	public static List<FlashSaleAppException> validateNewEvent(Event event){
+		
 		List<FlashSaleAppException> exceptions = new ArrayList<>();
+		LocalDateTime currentDateTime = LocalDateTime.now();
 		
 		if(StringUtils.isEmpty(event.getEventName())){
 			exceptions.add(new ValidationException("Event name is required"));
@@ -54,9 +56,12 @@ public class EventValidator {
 			exceptions.add(new ValidationException("Event start time should be before Event end time"));
 		}
 		
-		LocalDateTime currentDateTime = LocalDateTime.now();
+		if(currentDateTime.isAfter(event.getEndTime())) {
+			exceptions.add(new ValidationException("Cannot add an event which has already ended"));
+		}
+		
 		if((currentDateTime.isEqual(event.getStartTime()) || currentDateTime.isAfter(event.getStartTime())) && 
-				(currentDateTime.isBefore(event.getEndTime()) || currentDateTime.isEqual(event.getStartTime()))) {
+				(currentDateTime.isBefore(event.getEndTime()) || currentDateTime.isEqual(event.getEndTime()))) {
 			event.setStatus(EventStatus.ACTIVE);
 		}else {
 			event.setStatus(EventStatus.CLOSED);			
