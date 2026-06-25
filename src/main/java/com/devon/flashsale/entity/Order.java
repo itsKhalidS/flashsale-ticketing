@@ -22,7 +22,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "ORDERS")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "user"})
 public class Order extends BaseEntity {
 
     @Id

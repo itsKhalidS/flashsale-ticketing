@@ -52,6 +52,10 @@ public class JwtService {
 	            .getPayload();
 	}
 	
+	public Long extractUserId(String token) { 
+		return extractAllClaims(token).get("userId", Long.class);
+	}
+	
 	public String extractUsername(String token) {
 	    return extractAllClaims(token).getSubject();
 	}

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devon.flashsale.dto.OrderRequestDto;
+import com.devon.flashsale.dto.OrderResponseDto;
 import com.devon.flashsale.dto.PaymentRequestDto;
-import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.service.OrderService;
 import com.devon.flashsale.validation.OrderValidator;
@@ -39,7 +39,7 @@ public class OrderController {
 	 */
 	@GetMapping
 	@ResponseBody
-	public List<Order> fetchAllOrders(){
+	public List<OrderResponseDto> fetchAllOrders(){
 		log.info("Fetching all orders");
 		return orderService.getAllOrders();
 	}
@@ -50,10 +50,17 @@ public class OrderController {
 	 */
 	@GetMapping("/{id}")
 	@ResponseBody
-    public Order fetchOrderById(@PathVariable Long id) {
+    public OrderResponseDto fetchOrderById(@PathVariable Long id) {
 		log.info("Fetching Order with OrderId: {}", id);
         return orderService.getOrderById(id);
     }
+	
+	@GetMapping("my-orders")
+	@ResponseBody
+	public List<OrderResponseDto> fetchMyOrders(){
+		log.info("Fetching all orders of current user");
+		return orderService.getMyOrders();
+	}
 
 	/**
 	 * @param orderRequest : The OrderRequestDto
@@ -61,7 +68,7 @@ public class OrderController {
 	 */
 	@PostMapping("/create")
 	@ResponseBody
-	public Order createNewOrder(@RequestBody @Valid OrderRequestDto orderRequest) {
+	public OrderResponseDto createNewOrder(@RequestBody @Valid OrderRequestDto orderRequest) {
 		log.info("Order creation request received with IdempotencyKey: {}", orderRequest.getIdempotencyKey());
 		List<FlashSaleAppException> exceptions = OrderValidator.validateNewOrder(orderRequest);
 		if(exceptions.size() > 0) {
@@ -77,7 +84,7 @@ public class OrderController {
 	 */
 	@PutMapping("/{orderId}/confirm")
 	@ResponseBody
-    public Order confirmOrder(@PathVariable Long orderId, @RequestBody @Valid PaymentRequestDto paymentRequest) {
+    public OrderResponseDto confirmOrder(@PathVariable Long orderId, @RequestBody @Valid PaymentRequestDto paymentRequest) {
 		log.info("Order Confirmation request received for OrderId: {} with Payment Reference Number: {}", orderId, paymentRequest.getPaymentReference());
 		paymentRequest.setOrderId(orderId);
 		List<FlashSaleAppException> exceptions = OrderValidator.validatePaymentRequest(paymentRequest);
@@ -94,7 +101,7 @@ public class OrderController {
 	 */
 	@PutMapping("/{orderId}/cancel")
 	@ResponseBody
-    public Order cancelOrder(@PathVariable Long orderId) {
+    public OrderResponseDto cancelOrder(@PathVariable Long orderId) {
 		log.info("Order Cancel request received for OrderId: {}", orderId);
         return orderService.cancelOrder(orderId);
     }

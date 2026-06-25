@@ -8,12 +8,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.devon.flashsale.dto.LoginUserDto;
 import com.devon.flashsale.dto.RegisterUserDto;
+import com.devon.flashsale.dto.UserProfileDto;
 import com.devon.flashsale.entity.User;
+import com.devon.flashsale.enums.UserRole;
+import com.devon.flashsale.exceptions.ResourceNotFoundException;
 import com.devon.flashsale.repository.UserRepository;
 import com.devon.flashsale.service.UserService;
 
@@ -29,8 +33,6 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 	
 	private final AuthenticationManager authenticationManager;
-	
-	public static final String USER_ROLE = "USER";
 	
 	public UserServiceImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager) {
 		this.passwordEncoder = passwordEncoder;
@@ -50,7 +52,7 @@ public class UserServiceImpl implements UserService {
 		newUser.setName(newUserDetails.getName());
 		newUser.setEmail(newUserDetails.getEmail());
 		newUser.setPassword(passwordEncoder.encode(newUserDetails.getPassword()));
-		newUser.setRole(USER_ROLE);
+		newUser.setRole(UserRole.USER);
 		newUser = userRepository.save(newUser);
 		log.info("New user with User Id: "+newUser.getUserId()+", Name: "+newUser.getName()+" and Email: "+newUser.getEmail()+" has been created");
 		return newUser;
@@ -67,5 +69,17 @@ public class UserServiceImpl implements UserService {
 		Optional<User> optionalUser = userRepository.findByEmail(userDetails.getEmail());
 		User user = optionalUser.orElseThrow(() -> new BadCredentialsException("Bad credentials"));
 		return user;
+	}
+	
+	@Override
+	public UserProfileDto getCurrentUserProfile() {
+	    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException( "User Authentication Error"));
+	    UserProfileDto dto = new UserProfileDto();
+	    dto.setUserId(user.getUserId());
+	    dto.setName(user.getName());
+	    dto.setEmail(user.getEmail());
+	    dto.setRole(user.getRole());
+	    return dto;
 	}
 }

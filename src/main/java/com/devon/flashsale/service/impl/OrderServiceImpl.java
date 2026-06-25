@@ -7,13 +7,16 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.devon.flashsale.config.FlashSaleMetricsConfig;
+import com.devon.flashsale.dto.OrderResponseDto;
 import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.entity.Payment;
+import com.devon.flashsale.entity.User;
 import com.devon.flashsale.enums.OrderStatus;
 import com.devon.flashsale.enums.PaymentStatus;
 import com.devon.flashsale.exceptions.InvalidStateException;
@@ -24,6 +27,7 @@ import com.devon.flashsale.exceptions.ValidationException;
 import com.devon.flashsale.repository.EventRepository;
 import com.devon.flashsale.repository.OrderRepository;
 import com.devon.flashsale.repository.PaymentRepository;
+import com.devon.flashsale.repository.UserRepository;
 import com.devon.flashsale.service.OrderService;
 
 import jakarta.persistence.OptimisticLockException;
@@ -34,29 +38,61 @@ public class OrderServiceImpl implements OrderService {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 	private final int MAX_ATTEMPTS = 3;
+	private final UserRepository userRepository;
 	private final OrderRepository orderRepository;
 	private final EventRepository eventRepository;
 	private final PaymentRepository paymentRepository;
 	private final FlashSaleMetricsConfig flashSaleMetricsConfig;
 	
-	public OrderServiceImpl(OrderRepository orderRepository, EventRepository eventRepository, PaymentRepository paymentRepository, FlashSaleMetricsConfig flashSaleMetricsConfig) {
+	public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, EventRepository eventRepository, PaymentRepository paymentRepository, FlashSaleMetricsConfig flashSaleMetricsConfig) {
+		this.userRepository = userRepository;
 		this.orderRepository = orderRepository;
 		this.eventRepository = eventRepository;
 		this.paymentRepository = paymentRepository;
 		this.flashSaleMetricsConfig = flashSaleMetricsConfig;
 	}
 	
-	@Override
-	public List<Order> getAllOrders() {
-		return orderRepository.findAll();
+	private User getCurrentUser() {
+	    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+	    return userRepository.findByEmail(email)
+	    		.orElseThrow(() -> new ResourceNotFoundException( "User Authentication Error" ));
+	}
+	
+	private OrderResponseDto convertToDto(Order order) {
+	    OrderResponseDto orderResponseDto = new OrderResponseDto();
+	    orderResponseDto.setOrderId(order.getOrderId());
+	    orderResponseDto.setEventId(order.getEvent().getEventId());
+	    orderResponseDto.setEventName(order.getEvent().getEventName());
+	    orderResponseDto.setQuantity(order.getQty());
+	    orderResponseDto.setStatus(order.getStatus());
+	    if(order.getPayment() != null) {
+	    	orderResponseDto.setPaymentReference(order.getPayment().getPaymentReference());
+	    }
+	    orderResponseDto.setTicketNumber(order.getTicketNumber());
+	    orderResponseDto.setCreatedAt(order.getCreatedAt());
+
+	    return orderResponseDto;
 	}
 	
 	@Override
-	public Order getOrderById(Long id) {
+	public List<OrderResponseDto> getAllOrders() {
+		return orderRepository.findAll().stream().map(this::convertToDto).toList();
+	}
+	
+	@Override
+	public OrderResponseDto getOrderById(Long id) {
 		Order order = orderRepository.findById(id)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+id+"]"));
 		log.info("Order with Order Id: {} found", order.getOrderId());
-		return order;
+		return convertToDto(order);
+	}
+	
+	@Override
+	public List<OrderResponseDto> getMyOrders() {
+		User currentUser = getCurrentUser();
+	    List<Order> orders = orderRepository.findByUser(currentUser);
+
+	    return orders.stream().map(this::convertToDto).toList();
 	}
 	
 	@Override
@@ -67,11 +103,11 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Override
 	@Transactional
-	public Order createOrder(Long eventId, int quantity, String idempotencyKey) {
+	public OrderResponseDto createOrder(Long eventId, int quantity, String idempotencyKey) {
 		Optional<Order> fetchedOrder = orderRepository.findByIdempotencyKey(idempotencyKey);
 		if(fetchedOrder.isPresent()) {
 			log.info("Order with Idempotency Key: {} already exists", idempotencyKey);
-			return fetchedOrder.get();
+			return convertToDto(fetchedOrder.get());
 		}
 
 		Event event = eventRepository.findById(eventId)
@@ -114,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		Order order = new Order();
+		order.setUser(getCurrentUser());
 		order.setEvent(event);
 		order.setQty(quantity);
 		order.setIdempotencyKey(idempotencyKey);
@@ -129,16 +166,16 @@ public class OrderServiceImpl implements OrderService {
 		} catch(ObjectOptimisticLockingFailureException | OptimisticLockException e) {
 			log.error("Failed in  creating order with Idempotency Key: ["+idempotencyKey+"]");
 		}
-		return savedOrder;
+		return convertToDto(savedOrder);
 	}
 
 	@Override
 	@Transactional
-	public Order createOrderWithoutOptimisticLock(Long eventId, int quantity, String idempotencyKey) {
+	public OrderResponseDto createOrderWithoutOptimisticLock(Long eventId, int quantity, String idempotencyKey) {
 		Optional<Order> fetchedOrder = orderRepository.findByIdempotencyKey(idempotencyKey);
 		if(fetchedOrder.isPresent()) {
 			log.info("Order with Idempotency Key: {} already exists", idempotencyKey);
-			return fetchedOrder.get();
+			return convertToDto(fetchedOrder.get());
 		}
 
 		Event event = eventRepository.findById(eventId)
@@ -160,6 +197,7 @@ public class OrderServiceImpl implements OrderService {
 		log.info("Event with Event Id: {} updated", eventId);
 		
 		Order order = new Order();
+		order.setUser(getCurrentUser());
 		order.setEvent(event);
 		order.setQty(quantity);
 		order.setIdempotencyKey(idempotencyKey);
@@ -176,12 +214,12 @@ public class OrderServiceImpl implements OrderService {
 			log.error("Failed in  creating order with Idempotency Key: ["+idempotencyKey+"]");
 		}
 		
-		return savedOrder;
+		return convertToDto(savedOrder);
 	}
 
 	@Override
 	@Transactional
-	public Order confirmOrder(PaymentRequestDto paymentRequest) {
+	public OrderResponseDto confirmOrder(PaymentRequestDto paymentRequest) {
 		Order order = orderRepository.findById(paymentRequest.getOrderId())
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+paymentRequest.getOrderId()+"]"));
 		
@@ -208,12 +246,12 @@ public class OrderServiceImpl implements OrderService {
 			throw new ValidationException("Cannot confirm order with Order Id: ["+order.getOrderId()+"]");
 		}
 		order.setPayment(savedPayment);
-		return savedOrder;
+		return convertToDto(savedOrder);
 	}
 
 	@Override
 	@Transactional
-	public Order cancelOrder(Long orderId) {
+	public OrderResponseDto cancelOrder(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+orderId+"]"));
 		
@@ -222,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		if(order.getStatus() == OrderStatus.CANCELLED) {
-			return order;
+			return convertToDto(order);
 		}
 		
 		Event event;
@@ -273,12 +311,12 @@ public class OrderServiceImpl implements OrderService {
 			log.info("Amount of Rs {} refunded for Order Id: {} ", payment.getAmount(), orderId);			
 		}
 		
-		return updatedOrder;
+		return convertToDto(updatedOrder);
 	}
 
 	@Override
 	@Transactional
-	public Order cancelOrderWithoutOptimisticLock(Long orderId) {
+	public OrderResponseDto cancelOrderWithoutOptimisticLock(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+orderId+"]"));
 		
@@ -287,7 +325,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		if(order.getStatus() == OrderStatus.CANCELLED) {
-			return order;
+			return convertToDto(order);
 		}
 		
 		Event event = order.getEvent();
@@ -317,7 +355,7 @@ public class OrderServiceImpl implements OrderService {
 			log.info("Amount of Rs {} refunded for Order Id: {} ", payment.getAmount(), orderId);			
 		}
 		
-		return updatedOrder;
+		return convertToDto(updatedOrder);
 	}
 	
 	@Override

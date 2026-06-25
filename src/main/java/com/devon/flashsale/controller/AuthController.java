@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devon.flashsale.dto.LoginResponseDto;
@@ -32,6 +33,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
+	@ResponseBody
 	public ResponseEntity<String> registerNewUser(@RequestBody @Valid RegisterUserDto newUserDetails) {
 		log.info("Creating new User with name "+newUserDetails.getName());
 		userService.createNewUser(newUserDetails);
@@ -39,6 +41,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
+	@ResponseBody
 	public  ResponseEntity<LoginResponseDto> loginNewUser(@RequestBody @Valid LoginUserDto loginRequest) {
 		User user = userService.loginUser(loginRequest);
 		return ResponseEntity.ok(new LoginResponseDto(jwtService.generateJwtToken(user)));

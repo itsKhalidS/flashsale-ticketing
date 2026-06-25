@@ -2,11 +2,14 @@ package com.devon.flashsale.entity;
 
 import java.util.List;
 
+import com.devon.flashsale.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,8 +36,9 @@ public class User extends BaseEntity {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
-	private String role;
+	private UserRole role;
 	
 	@OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Order> orders;
@@ -71,11 +75,11 @@ public class User extends BaseEntity {
 		this.password = password;
 	}
 
-	public String getRole() {
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
 

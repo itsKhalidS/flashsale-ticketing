@@ -2,6 +2,7 @@ package com.devon.flashsale.service;
 
 import java.util.List;
 
+import com.devon.flashsale.dto.OrderResponseDto;
 import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.enums.OrderStatus;
@@ -11,14 +12,14 @@ public interface OrderService {
 	/**
 	 * Fetches and returns all orders.
 	 */
-	public List<Order> getAllOrders();
+	public List<OrderResponseDto> getAllOrders();
 	
 	/**
 	 * Fetch order for a particular orderId.
 	 * @param id : The orderId
 	 * @return The fetched Order
 	 */
-	public Order getOrderById(Long id);
+	public OrderResponseDto getOrderById(Long id);
 	
 	/**
 	 * Fetches all the orders having a particular status.
@@ -34,7 +35,7 @@ public interface OrderService {
 	 * @param idempotencyKey : A unique identifier associated with each order
 	 * @return The Order created
 	 */
-	public Order createOrder(Long eventId, int quantity, String idempotencyKey);
+	public OrderResponseDto createOrder(Long eventId, int quantity, String idempotencyKey);
 	
 	/** 
 	 * Creates a new Order for the event with a particular eventId.
@@ -45,7 +46,7 @@ public interface OrderService {
 	 * @param idempotencyKey : A unique identifier associated with each order
 	 * @return The Order created
 	 */
-	public Order createOrderWithoutOptimisticLock(Long eventId, int quantity, String idempotencyKey);
+	public OrderResponseDto createOrderWithoutOptimisticLock(Long eventId, int quantity, String idempotencyKey);
 	
 	
 	/**
@@ -53,7 +54,7 @@ public interface OrderService {
 	 * @param paymentRequest : DTO object containing order and payment details
 	 * @return The confirmed Order
 	 */
-	public Order confirmOrder(PaymentRequestDto paymentRequest);
+	public OrderResponseDto confirmOrder(PaymentRequestDto paymentRequest);
 	
 	
 	/** 
@@ -62,7 +63,7 @@ public interface OrderService {
 	 * @param orderId : The orderId of the order
 	 * @return The cancelled order
 	 */
-	public Order cancelOrder(Long orderId);
+	public OrderResponseDto cancelOrder(Long orderId);
 	
 	/** 
 	 * Cancel an existing order.
@@ -71,7 +72,7 @@ public interface OrderService {
 	 * @param orderId : The orderId of the order
 	 * @return The cancelled order
 	 */
-	public Order cancelOrderWithoutOptimisticLock(Long orderId);
+	public OrderResponseDto cancelOrderWithoutOptimisticLock(Long orderId);
 	
 	/**
 	 * Expires an Order which is in PENDING state for more than 5 minutes.
@@ -87,4 +88,6 @@ public interface OrderService {
 	 * @param order : The order to expire
 	 */
 	public void expirePendingOrderWithoutOptimisticLock(Order order);
+
+	List<OrderResponseDto> getMyOrders();
 }
