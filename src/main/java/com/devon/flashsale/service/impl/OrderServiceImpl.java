@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import com.devon.flashsale.entity.Payment;
 import com.devon.flashsale.entity.User;
 import com.devon.flashsale.enums.OrderStatus;
 import com.devon.flashsale.enums.PaymentStatus;
+import com.devon.flashsale.enums.UserRole;
 import com.devon.flashsale.exceptions.InvalidStateException;
 import com.devon.flashsale.exceptions.OutOfStockException;
 import com.devon.flashsale.exceptions.ResourceNotFoundException;
@@ -58,6 +61,16 @@ public class OrderServiceImpl implements OrderService {
 	    		.orElseThrow(() -> new ResourceNotFoundException( "User Authentication Error" ));
 	}
 	
+	private void validateOrderAccess(Order order) {
+	    User currentUser = getCurrentUser();
+	    if(currentUser.getRole() == UserRole.ADMIN) {
+	        return;
+	    }
+	    if(!order.getUser().getEmail().equals(currentUser.getEmail())) {
+	        throw new AuthorizationDeniedException("Invalid order details provided");
+	    }
+	}
+	
 	private OrderResponseDto convertToDto(Order order) {
 	    OrderResponseDto orderResponseDto = new OrderResponseDto();
 	    orderResponseDto.setOrderId(order.getOrderId());
@@ -75,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 	
 	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<OrderResponseDto> getAllOrders() {
 		return orderRepository.findAll().stream().map(this::convertToDto).toList();
 	}
@@ -84,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findById(id)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+id+"]"));
 		log.info("Order with Order Id: {} found", order.getOrderId());
+		validateOrderAccess(order);
 		return convertToDto(order);
 	}
 	
@@ -93,12 +108,6 @@ public class OrderServiceImpl implements OrderService {
 	    List<Order> orders = orderRepository.findByUser(currentUser);
 
 	    return orders.stream().map(this::convertToDto).toList();
-	}
-	
-	@Override
-	public List<Order> getAllOrdersByStatus(OrderStatus status) {
-		log.info("Fetching all orders having status = {} ", status.toString());
-		return orderRepository.findAllByStatus(status);
 	}
 	
 	@Override
@@ -222,7 +231,7 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponseDto confirmOrder(PaymentRequestDto paymentRequest) {
 		Order order = orderRepository.findById(paymentRequest.getOrderId())
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+paymentRequest.getOrderId()+"]"));
-		
+		validateOrderAccess(order);
 		if(order.getStatus() != OrderStatus.PENDING) {
 			throw new InvalidStateException("The specified order is not pending.");
 		}
@@ -254,7 +263,7 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponseDto cancelOrder(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+orderId+"]"));
-		
+		validateOrderAccess(order);
 		if(order.getStatus() == OrderStatus.EXPIRED) {
 			throw new InvalidStateException("The specified order has expired");
 		}
@@ -319,7 +328,7 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponseDto cancelOrderWithoutOptimisticLock(Long orderId) {
 		Order order = orderRepository.findById(orderId)
 				.orElseThrow(()-> new ResourceNotFoundException("No Order Found for id ["+orderId+"]"));
-		
+		validateOrderAccess(order);
 		if(order.getStatus() == OrderStatus.EXPIRED) {
 			throw new InvalidStateException("The specified order has expired");
 		}
@@ -356,6 +365,12 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		return convertToDto(updatedOrder);
+	}
+	
+	@Override
+	public List<Order> getAllOrdersByStatus(OrderStatus status) {
+		log.info("Fetching all orders having status = {} ", status.toString());
+		return orderRepository.findAllByStatus(status);
 	}
 	
 	@Override
