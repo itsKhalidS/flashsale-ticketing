@@ -89,5 +89,7 @@ public interface OrderService {
 	 */
 	public void expirePendingOrderWithoutOptimisticLock(Order order);
 
-	List<OrderResponseDto> getMyOrders();
+	public List<OrderResponseDto> getMyOrders();
+	
+	public String generateTicketNumber(Long orderId);
 }

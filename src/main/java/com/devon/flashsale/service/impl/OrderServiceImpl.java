@@ -1,6 +1,8 @@
 package com.devon.flashsale.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +42,14 @@ import jakarta.transaction.Transactional;
 public class OrderServiceImpl implements OrderService {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
-	private final int MAX_ATTEMPTS = 3;
 	private final UserRepository userRepository;
 	private final OrderRepository orderRepository;
 	private final EventRepository eventRepository;
 	private final PaymentRepository paymentRepository;
 	private final FlashSaleMetricsConfig flashSaleMetricsConfig;
+	
+	private final int MAX_ATTEMPTS = 3;
+	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.BASIC_ISO_DATE;
 	
 	public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, EventRepository eventRepository, PaymentRepository paymentRepository, FlashSaleMetricsConfig flashSaleMetricsConfig) {
 		this.userRepository = userRepository;
@@ -83,6 +87,7 @@ public class OrderServiceImpl implements OrderService {
 	    }
 	    orderResponseDto.setTicketNumber(order.getTicketNumber());
 	    orderResponseDto.setCreatedAt(order.getCreatedAt());
+	    orderResponseDto.setExpiresAt(order.getExpiresAt());
 
 	    return orderResponseDto;
 	}
@@ -246,11 +251,12 @@ public class OrderServiceImpl implements OrderService {
 				, paymentRequest.getAmount(), paymentRequest.getOrderId(), paymentRequest.getPaymentReference());
 		
 		order.setStatus(OrderStatus.CONFIRMED);
+		order.setTicketNumber(generateTicketNumber(order.getOrderId()));
 		Order savedOrder = null;
 		try {
 			savedOrder = orderRepository.save(order);
-			log.info("Order with Order Id: {} and Idempotency Key: {} has been CONFIRMED"
-					, savedOrder.getOrderId(), savedOrder.getIdempotencyKey());
+			log.info("Order with Order Id: {}, Ticket Number: {} and Idempotency Key: {} has been CONFIRMED"
+					, savedOrder.getOrderId(), savedOrder.getTicketNumber(), savedOrder.getIdempotencyKey());
 		} catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
 			throw new ValidationException("Cannot confirm order with Order Id: ["+order.getOrderId()+"]");
 		}
@@ -433,5 +439,12 @@ public class OrderServiceImpl implements OrderService {
 			log.error("Failed in expiring order with OrderId: ["+order.getOrderId()+"]");
 		}
 	}
+
+	@Override
+	public String generateTicketNumber(Long orderId) {
+        String date = LocalDate.now().format(DATE_FORMAT);
+
+        return String.format("TID-%s-%08d", date, orderId);
+    }
 
 }

@@ -21,6 +21,8 @@ public class OrderResponseDto {
     private String ticketNumber;
 
     private LocalDateTime createdAt;
+    
+    private LocalDateTime expiresAt;
 
 	public Long getOrderId() {
 		return orderId;
@@ -86,5 +88,12 @@ public class OrderResponseDto {
 		this.createdAt = createdAt;
 	}
 
+	public LocalDateTime getExpiresAt() {
+		return expiresAt;
+	}
+
+	public void setExpiresAt(LocalDateTime expiresAt) {
+		this.expiresAt = expiresAt;
+	}
     
 }
