@@ -37,36 +37,27 @@ public class EventValidator {
 		}else if(event.getTotalSeats() < 0){
 			exceptions.add(new ValidationException("Value of seats cannot be negative"));
 		}else {
-			if(event.getRemainingSeats() != null && event.getRemainingSeats().compareTo(event.getTotalSeats()) > 1) {
-				exceptions.add(new ValidationException("Remaining seats cannot be greater than Total seats"));
-			}
-			if(event.getRemainingSeats() != null && event.getRemainingSeats() < 0) {
-				exceptions.add(new ValidationException("Remaining seats cannot be negative"));
-			}
 			event.setRemainingSeats(event.getTotalSeats());
 		}
 		
 		if(event.getStartTime()==null) {
 			exceptions.add(new ValidationException("Event start time is required"));
-		}
-		
-		if(event.getEndTime()==null) {
+		}else if(event.getEndTime()==null) {
 			exceptions.add(new ValidationException("Event end time is required"));
-		}
-		
-		if(event.getStartTime().isEqual(event.getEndTime()) || event.getStartTime().isAfter(event.getEndTime())) {
-			exceptions.add(new ValidationException("Event start time should be before Event end time"));
-		}
-		
-		if(currentDateTime.isAfter(event.getEndTime())) {
-			exceptions.add(new ValidationException("Cannot add an event which has already ended"));
-		}
-		
-		if((currentDateTime.isEqual(event.getStartTime()) || currentDateTime.isAfter(event.getStartTime())) && 
-				(currentDateTime.isBefore(event.getEndTime()) || currentDateTime.isEqual(event.getEndTime()))) {
-			event.setStatus(EventStatus.ACTIVE);
 		}else {
-			event.setStatus(EventStatus.CLOSED);			
+			if(event.getStartTime().isEqual(event.getEndTime()) || event.getStartTime().isAfter(event.getEndTime())) {
+				exceptions.add(new ValidationException("Event start time should be before Event end time"));
+			}
+			if(currentDateTime.isAfter(event.getEndTime())) {
+				exceptions.add(new ValidationException("Cannot add an event which has already ended"));
+			}			
+			if((currentDateTime.isEqual(event.getStartTime()) || currentDateTime.isAfter(event.getStartTime())) && 
+					(currentDateTime.isBefore(event.getEndTime()) || currentDateTime.isEqual(event.getEndTime()))) {
+				event.setStatus(EventStatus.ACTIVE);
+			}else {
+				event.setStatus(EventStatus.INACTIVE);			
+			}
+			
 		}
 		
 		return exceptions;

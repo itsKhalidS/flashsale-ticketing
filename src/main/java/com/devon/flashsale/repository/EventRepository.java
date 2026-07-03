@@ -1,6 +1,7 @@
 package com.devon.flashsale.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +11,7 @@ import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.enums.EventStatus;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
 	final String incrementQuery = " UPDATE "+
 			                      "   Event evt "+

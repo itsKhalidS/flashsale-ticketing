@@ -37,7 +37,7 @@ public class EventScheduler {
 					eventService.updateEventStatus(e.getEventId(), EventStatus.CLOSED);
 				}
 			}
-			else if(e.getStatus() == EventStatus.CLOSED) {
+			else if(e.getStatus() == EventStatus.INACTIVE) {
 				LocalDateTime currentDateTime = LocalDateTime.now();
 				if((currentDateTime.isEqual(e.getStartTime()) || currentDateTime.isAfter(e.getStartTime())) && 
 						(currentDateTime.isBefore(e.getEndTime()) || currentDateTime.isEqual(e.getStartTime()))) {

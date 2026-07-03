@@ -1,7 +1,5 @@
 package com.devon.flashsale.controller;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -9,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devon.flashsale.dto.EventCreationDto;
 import com.devon.flashsale.dto.EventResponseDto;
+import com.devon.flashsale.dto.PageResponse;
 import com.devon.flashsale.service.EventService;
 
 import jakarta.validation.Valid;
@@ -25,6 +25,10 @@ import jakarta.validation.Valid;
 public class EventController {
 	
 	private static final Logger log = LoggerFactory.getLogger(EventController.class);
+	
+	private static final int pageSize = 10;
+	private static final String sortBy = "startTime";
+	private static final String sortDirection = "asc";
 	
 	private final EventService eventService;
 	
@@ -36,10 +40,10 @@ public class EventController {
 	 * @return The List of all events
 	 */
 	@GetMapping
-	@ResponseBody
-	public List<EventResponseDto> fetchAllEvents() {
-		log.info("Fetching all events");
-		return eventService.getAllEvents();
+	@ResponseBody	
+	public PageResponse<EventResponseDto> fetchAllEvents(@RequestParam(defaultValue = "0") int page) {
+	    log.info("Fetching events page={}, size={}, sortBy={}, direction={}",page, pageSize, sortBy, sortDirection);
+	    return eventService.getAllEventsPaginated(page, pageSize, sortBy, sortDirection);
 	}
 	
 	/**

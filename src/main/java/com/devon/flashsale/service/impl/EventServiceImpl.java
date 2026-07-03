@@ -4,12 +4,18 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devon.flashsale.dto.EventCreationDto;
 import com.devon.flashsale.dto.EventResponseDto;
+import com.devon.flashsale.dto.PageResponse;
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
@@ -17,6 +23,7 @@ import com.devon.flashsale.exceptions.ResourceNotFoundException;
 import com.devon.flashsale.repository.EventRepository;
 import com.devon.flashsale.service.EventService;
 import com.devon.flashsale.service.storage.StorageService;
+import com.devon.flashsale.specification.EventSpecification;
 import com.devon.flashsale.validation.EventValidator;
 
 import jakarta.transaction.Transactional;
@@ -57,6 +64,20 @@ public class EventServiceImpl implements EventService {
 		eventDto.setImageUrl(event.getImageUrl());
 		return eventDto;
 	}
+		
+	public PageResponse<EventResponseDto> convertDbPageResponseToDto(Page<Event> pageResponseFromDb){
+		PageResponse<EventResponseDto> response = new PageResponse<>();
+
+		response.setContent(pageResponseFromDb.getContent().stream().map(this::convertEventToEventResponseDto).toList());
+		response.setPage(pageResponseFromDb.getNumber());
+		response.setSize(pageResponseFromDb.getSize());
+		response.setTotalElements(pageResponseFromDb.getTotalElements());
+		response.setTotalPages(pageResponseFromDb.getTotalPages());
+		response.setFirst(pageResponseFromDb.isFirst());
+		response.setLast(pageResponseFromDb.isLast());
+		
+		return response;
+	}
 
 	@Override
 	@PreAuthorize("hasRole('ADMIN')")
@@ -79,10 +100,27 @@ public class EventServiceImpl implements EventService {
 		    throw exp;
 		}
 	}
-
+	
 	@Override
-	public List<EventResponseDto> getAllEvents() {
-		return eventRepository.findAll().stream().map(this::convertEventToEventResponseDto).toList();
+	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction) {
+		if (page < 0) {
+	        throw new IllegalArgumentException("Page number cannot be negative.");
+	    }
+	    if (size <= 0 || size > 50) {
+	        throw new IllegalArgumentException("Page size must be between 1 and 50.");
+	    }
+	    
+	    Specification<Event> specification = EventSpecification.hasStatuses(List.of(EventStatus.ACTIVE, EventStatus.INACTIVE));
+	    
+	    Sort sort = direction.equalsIgnoreCase("desc")
+	            ? Sort.by(sortBy).descending()
+	            : Sort.by(sortBy).ascending();
+	   
+	    Pageable pageable = PageRequest.of(page, size, sort);
+	    
+	   Page<Event> pageResponseFromDb =  eventRepository.findAll(specification, pageable);
+	   
+	   return convertDbPageResponseToDto(pageResponseFromDb);
 	}
 
 	@Override
@@ -91,6 +129,11 @@ public class EventServiceImpl implements EventService {
 				.orElseThrow(() -> new ResourceNotFoundException("No Event Found for id ["+eventId+"]") );
 		log.info("Event with Event Id: {} found", event.getEventId());
 		return convertEventToEventResponseDto(event);
+	}
+	
+	@Override
+	public List<EventResponseDto> getAllEvents() {
+		return eventRepository.findAll().stream().map(this::convertEventToEventResponseDto).toList();
 	}
 	
 	@Override
