@@ -2,7 +2,10 @@ package com.devon.flashsale.service;
 
 import java.util.List;
 
-import com.devon.flashsale.entity.Event;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.devon.flashsale.dto.EventCreationDto;
+import com.devon.flashsale.dto.EventResponseDto;
 import com.devon.flashsale.enums.EventStatus;
 
 public interface EventService {
@@ -12,18 +15,18 @@ public interface EventService {
 	 * @param event
 	 * @return The event created
 	 */
-	public Event createEvent(Event event);
+	public EventResponseDto createEvent(EventCreationDto eventDto, MultipartFile file);
 	
 	/** Fetches all events
 	 * @return
 	 */
-	public List<Event> getAllEvents();
+	public List<EventResponseDto> getAllEvents();
 	
 	/** Fetches event for the particular event id.
 	 * @param eventId 
 	 * @return
 	 */
-	public Event getEventById(Long eventId);
+	public EventResponseDto getEventById(Long eventId);
 	
 	/** Update the Status of a particular event
 	 * @param eventId : The eventId of the Event

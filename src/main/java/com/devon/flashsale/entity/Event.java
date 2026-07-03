@@ -33,6 +33,9 @@ public class Event extends BaseEntity {
     @Column(name = "event_name", nullable = false)
     @Size(max = 255, message = "Event name length exceeded")
     private String eventName;
+    
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "total_seats", nullable = false)
     private Integer totalSeats;
@@ -53,6 +56,9 @@ public class Event extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private EventStatus status;  // ACTIVE, CLOSED, CANCELLED
+    
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
 
     @OneToMany(mappedBy = "event",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Order> orders;
@@ -71,6 +77,14 @@ public class Event extends BaseEntity {
 
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public Integer getTotalSeats() {
@@ -119,6 +133,14 @@ public class Event extends BaseEntity {
 
 	public void setStatus(EventStatus status) {
 		this.status = status;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public List<Order> getOrders() {

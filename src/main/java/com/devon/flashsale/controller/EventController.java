@@ -4,18 +4,19 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.devon.flashsale.entity.Event;
-import com.devon.flashsale.exceptions.FlashSaleAppException;
+import com.devon.flashsale.dto.EventCreationDto;
+import com.devon.flashsale.dto.EventResponseDto;
 import com.devon.flashsale.service.EventService;
-import com.devon.flashsale.validation.EventValidator;
 
 import jakarta.validation.Valid;
 
@@ -36,7 +37,7 @@ public class EventController {
 	 */
 	@GetMapping
 	@ResponseBody
-	public List<Event> fetchAllEvents() {
+	public List<EventResponseDto> fetchAllEvents() {
 		log.info("Fetching all events");
 		return eventService.getAllEvents();
 	}
@@ -47,23 +48,21 @@ public class EventController {
 	 */
 	@GetMapping("/{id}")
 	@ResponseBody
-	public Event fetchEventById(@PathVariable Long id) {
+	public EventResponseDto fetchEventById(@PathVariable Long id) {
 		log.info("Fetching event with EventId: {}", id);
 		return eventService.getEventById(id);
 	}
-
+	
 	/**
-	 * @param event : The event to create
+	 * 
+	 * @param eventDto : The event to create
+	 * @param image : The event image
 	 * @return The created event
 	 */
-	@PostMapping("/create")
+	@PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
-	public Event createNewEvent(@RequestBody @Valid Event event) {
-		log.info("Event Creation request received for Event: {}", event.getEventName());
-		List<FlashSaleAppException> exceptions = EventValidator.validateNewEvent(event);
-		if(exceptions.size() > 0) {
-			throw exceptions.get(0);
-		}
-		return eventService.createEvent(event);
+	public EventResponseDto createNewEvent( @RequestPart("event") @Valid EventCreationDto eventDto, @RequestPart("image") MultipartFile image){
+		log.info("Event Creation request received for Event: {}", eventDto.getEventName());
+		return eventService.createEvent(eventDto, image);
 	}
 }

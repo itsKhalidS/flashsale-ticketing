@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.devon.flashsale.entity.Event;
+import com.devon.flashsale.dto.EventResponseDto;
 import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.service.EventService;
 
@@ -29,8 +29,8 @@ public class EventScheduler {
 	@Scheduled(fixedDelay = 60000)
 	public void run() {
 		log.info("Executing scheduled Event Status updation");
-		List<Event> eventList = eventService.getAllEvents();
-		for(Event e: eventList) {
+		List<EventResponseDto> eventList = eventService.getAllEvents();
+		for(EventResponseDto e: eventList) {
 			if (e.getStatus() == EventStatus.ACTIVE) {
 				LocalDateTime currentDateTime = LocalDateTime.now();
 				if(currentDateTime.isBefore(e.getStartTime()) || currentDateTime.isAfter(e.getEndTime())) {

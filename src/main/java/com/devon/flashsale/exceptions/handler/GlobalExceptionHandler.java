@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.devon.flashsale.dto.ErrorResponseDto;
+import com.devon.flashsale.exceptions.FileStorageException;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.exceptions.InvalidStateException;
 import com.devon.flashsale.exceptions.OutOfStockException;
@@ -76,6 +77,13 @@ public class GlobalExceptionHandler {
 		log.error(ex.getMessage(), ex);
 		ErrorResponseDto erd = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value() , ex.getMessage());
 		return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(FileStorageException.class)
+	public ResponseEntity<ErrorResponseDto> handleFileStorageException(FileStorageException ex) {
+		log.error(ex.getMessage(), ex);
+		ErrorResponseDto erd = new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value() , ex.getMessage());
+		return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(FlashSaleAppException.class)
