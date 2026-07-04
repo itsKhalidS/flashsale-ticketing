@@ -18,6 +18,10 @@ public class PageResponse<T> {
 
     private boolean last;
 
+    private boolean hasNext;
+
+    private boolean hasPrevious;
+
 	public List<T> getContent() {
 		return content;
 	}
@@ -73,6 +77,21 @@ public class PageResponse<T> {
 	public void setLast(boolean last) {
 		this.last = last;
 	}
-    
-    
+
+	public boolean hasNext() {
+		return hasNext;
+	}
+
+	public void hasNext(boolean hasNext) {
+		this.hasNext = hasNext;
+	}
+
+	public boolean hasPrevious() {
+		return hasPrevious;
+	}
+
+	public void hasPrevious(boolean hasPrevious) {
+		this.hasPrevious = hasPrevious;
+	}
+        
 }

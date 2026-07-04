@@ -41,9 +41,9 @@ public class EventController {
 	 */
 	@GetMapping
 	@ResponseBody	
-	public PageResponse<EventResponseDto> fetchAllEvents(@RequestParam(defaultValue = "0") int page) {
-	    log.info("Fetching events page={}, size={}, sortBy={}, direction={}",page, pageSize, sortBy, sortDirection);
-	    return eventService.getAllEventsPaginated(page, pageSize, sortBy, sortDirection);
+	public PageResponse<EventResponseDto> fetchAllEvents(@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String search) {
+	    log.info("Fetching events for page={}, size={}, sortBy={}, direction={} and searchKeyword={}",page, pageSize, sortBy, sortDirection, search);
+	    return eventService.getAllEventsPaginated(page, pageSize, sortBy, sortDirection, search);
 	}
 	
 	/**

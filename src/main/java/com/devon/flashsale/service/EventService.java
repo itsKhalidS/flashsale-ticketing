@@ -21,7 +21,7 @@ public interface EventService {
 	/** Fetches all events
 	 * @return
 	 */
-	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction);
+	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction, String searchKeyword);
 	
 	/** Fetches event for the particular event id.
 	 * @param eventId 

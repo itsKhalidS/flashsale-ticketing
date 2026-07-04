@@ -110,6 +110,8 @@ public class OrderServiceImpl implements OrderService {
 		response.setTotalPages(pageResponseFromDb.getTotalPages());
 		response.setFirst(pageResponseFromDb.isFirst());
 		response.setLast(pageResponseFromDb.isLast());
+		response.hasNext(pageResponseFromDb.hasNext());
+		response.hasPrevious(pageResponseFromDb.hasPrevious());
 		
 		return response;
 	}
@@ -123,9 +125,10 @@ public class OrderServiceImpl implements OrderService {
 	    if (size <= 0 || size > 50) {
 	        throw new IllegalArgumentException("Page size must be between 1 and 50.");
 	    }
-	    Sort sort = direction.equalsIgnoreCase("desc")
-	            ? Sort.by(sortBy).descending()
-	            : Sort.by(sortBy).ascending();
+		
+	    Sort.Direction sortDirection = Sort.Direction.fromOptionalString(direction)
+	            .orElse(Sort.Direction.DESC);
+	    Sort sort = Sort.by(sortDirection, sortBy);
 	    
 	    Pageable pageable = PageRequest.of(page, size, sort);
 	    Page<Order> pageResponseFromDb = orderRepository.findAll(pageable);
@@ -142,9 +145,10 @@ public class OrderServiceImpl implements OrderService {
 	    }
 
 		User currentUser = getCurrentUser();
-	    Sort sort = direction.equalsIgnoreCase("desc")
-	            ? Sort.by(sortBy).descending()
-	            : Sort.by(sortBy).ascending();
+		
+	    Sort.Direction sortDirection = Sort.Direction.fromOptionalString(direction)
+	            .orElse(Sort.Direction.DESC);
+	    Sort sort = Sort.by(sortDirection, sortBy);
 	    
 	    Pageable pageable = PageRequest.of(page, size, sort);
 	    Page<Order> pageResponseFromDb = orderRepository.findByUser(currentUser, pageable);

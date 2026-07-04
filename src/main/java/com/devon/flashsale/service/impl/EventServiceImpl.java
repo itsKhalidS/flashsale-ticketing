@@ -75,6 +75,8 @@ public class EventServiceImpl implements EventService {
 		response.setTotalPages(pageResponseFromDb.getTotalPages());
 		response.setFirst(pageResponseFromDb.isFirst());
 		response.setLast(pageResponseFromDb.isLast());
+		response.hasNext(pageResponseFromDb.hasNext());
+		response.hasPrevious(pageResponseFromDb.hasPrevious());
 		
 		return response;
 	}
@@ -102,7 +104,7 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	@Override
-	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction) {
+	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction, String searchKeyword) {
 		
 		if (page < 0) {
 	        throw new IllegalArgumentException("Page number cannot be negative.");
@@ -111,12 +113,13 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalArgumentException("Page size must be between 1 and 50.");
 	    }
 	    
-	    Specification<Event> specification = EventSpecification.hasStatuses(List.of(EventStatus.ACTIVE, EventStatus.INACTIVE));
+	    Specification<Event> specification = EventSpecification.isOngoingOrUpcomingEvent()
+	    														.and(EventSpecification.nameContains(searchKeyword));
+	    	    
+	    Sort.Direction sortDirection = Sort.Direction.fromOptionalString(direction)
+	            .orElse(Sort.Direction.ASC);
+	    Sort sort = Sort.by(sortDirection, sortBy);
 	    
-	    Sort sort = direction.equalsIgnoreCase("desc")
-	            ? Sort.by(sortBy).descending()
-	            : Sort.by(sortBy).ascending();
-	   
 	    Pageable pageable = PageRequest.of(page, size, sort);
 	    
 	    Page<Event> pageResponseFromDb =  eventRepository.findAll(specification, pageable);
