@@ -3,6 +3,7 @@ package com.devon.flashsale.service;
 import java.util.List;
 
 import com.devon.flashsale.dto.OrderResponseDto;
+import com.devon.flashsale.dto.PageResponse;
 import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.enums.OrderStatus;
@@ -12,7 +13,7 @@ public interface OrderService {
 	/**
 	 * Fetches and returns all orders.
 	 */
-	public List<OrderResponseDto> getAllOrders();
+	public PageResponse<OrderResponseDto> getAllOrders(int page, int size, String sortBy, String direction);
 	
 	/**
 	 * Fetch order for a particular orderId.
@@ -89,7 +90,7 @@ public interface OrderService {
 	 */
 	public void expirePendingOrderWithoutOptimisticLock(Order order);
 
-	public List<OrderResponseDto> getMyOrders();
+	public PageResponse<OrderResponseDto> getMyOrders(int page, int size, String sortBy, String direction);
 	
 	public String generateTicketNumber(Long orderId);
 }

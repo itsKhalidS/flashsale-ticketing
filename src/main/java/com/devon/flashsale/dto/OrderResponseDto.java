@@ -2,6 +2,7 @@ package com.devon.flashsale.dto;
 
 import java.time.LocalDateTime;
 
+import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.enums.OrderStatus;
 
 public class OrderResponseDto {
@@ -11,10 +12,16 @@ public class OrderResponseDto {
     private Long eventId;
 
     private String eventName;
+    
+    private String eventDescription;
+    
+    private EventStatus eventStatus;
+    
+    private String eventImageUrl;
 
     private Integer quantity;
 
-    private OrderStatus status;
+    private OrderStatus orderStatus;
     
     private String paymentReference;
 
@@ -48,6 +55,30 @@ public class OrderResponseDto {
 		this.eventName = eventName;
 	}
 
+	public String getEventDescription() {
+		return eventDescription;
+	}
+
+	public void setEventDescription(String eventDescription) {
+		this.eventDescription = eventDescription;
+	}
+
+	public EventStatus getEventStatus() {
+		return eventStatus;
+	}
+
+	public void setEventStatus(EventStatus eventStatus) {
+		this.eventStatus = eventStatus;
+	}
+
+	public String getEventImageUrl() {
+		return eventImageUrl;
+	}
+
+	public void setEventImageUrl(String eventImageUrl) {
+		this.eventImageUrl = eventImageUrl;
+	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -56,12 +87,12 @@ public class OrderResponseDto {
 		this.quantity = quantity;
 	}
 
-	public OrderStatus getStatus() {
-		return status;
+	public OrderStatus getOrderStatus() {
+		return orderStatus;
 	}
 
-	public void setStatus(OrderStatus status) {
-		this.status = status;
+	public void setOrderStatus(OrderStatus orderStatus) {
+		this.orderStatus = orderStatus;
 	}
 
 	public String getPaymentReference() {

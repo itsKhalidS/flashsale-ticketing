@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devon.flashsale.dto.OrderRequestDto;
 import com.devon.flashsale.dto.OrderResponseDto;
+import com.devon.flashsale.dto.PageResponse;
 import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.service.OrderService;
@@ -28,6 +30,10 @@ public class OrderController {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 	
+	private static final int pageSize = 10;
+	private static final String sortBy = "createdAt";
+	private static final String sortDirection = "desc";
+	
 	private final OrderService orderService;
 	
 	public OrderController(OrderService orderService) {
@@ -39,9 +45,9 @@ public class OrderController {
 	 */
 	@GetMapping
 	@ResponseBody
-	public List<OrderResponseDto> fetchAllOrders(){
-		log.info("Fetching all orders");
-		return orderService.getAllOrders();
+	public PageResponse<OrderResponseDto> fetchAllOrders(@RequestParam(defaultValue = "0") int page){
+		log.info("Fetching all orders for page={}, size={}, sortBy={}, direction={}",page, pageSize, sortBy, sortDirection);
+		return orderService.getAllOrders(page, pageSize, sortBy, sortDirection);
 	}
 	
 	/**
@@ -57,9 +63,9 @@ public class OrderController {
 	
 	@GetMapping("my-orders")
 	@ResponseBody
-	public List<OrderResponseDto> fetchMyOrders(){
-		log.info("Fetching all orders of current user");
-		return orderService.getMyOrders();
+	public PageResponse<OrderResponseDto> fetchMyOrders(@RequestParam(defaultValue = "0") int page){
+		log.info("Fetching all orders of current user for page={}, size={}, sortBy={}, direction={}",page, pageSize, sortBy, sortDirection);
+		return orderService.getMyOrders(page, pageSize, sortBy, sortDirection);
 	}
 
 	/**

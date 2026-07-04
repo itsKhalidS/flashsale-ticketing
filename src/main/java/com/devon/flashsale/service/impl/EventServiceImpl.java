@@ -103,6 +103,7 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	public PageResponse<EventResponseDto> getAllEventsPaginated(int page, int size, String sortBy, String direction) {
+		
 		if (page < 0) {
 	        throw new IllegalArgumentException("Page number cannot be negative.");
 	    }
@@ -118,9 +119,9 @@ public class EventServiceImpl implements EventService {
 	   
 	    Pageable pageable = PageRequest.of(page, size, sort);
 	    
-	   Page<Event> pageResponseFromDb =  eventRepository.findAll(specification, pageable);
+	    Page<Event> pageResponseFromDb =  eventRepository.findAll(specification, pageable);
 	   
-	   return convertDbPageResponseToDto(pageResponseFromDb);
+	    return convertDbPageResponseToDto(pageResponseFromDb);
 	}
 
 	@Override

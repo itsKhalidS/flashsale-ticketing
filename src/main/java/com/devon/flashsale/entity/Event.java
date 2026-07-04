@@ -55,7 +55,7 @@ public class Event extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private EventStatus status;  // ACTIVE, CLOSED, CANCELLED
+    private EventStatus status;  // ACTIVE, INACTIVE, CLOSED, CANCELLED
     
     @Column(name = "image_url", length = 1000)
     private String imageUrl;

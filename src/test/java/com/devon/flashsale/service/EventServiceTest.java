@@ -1,5 +1,6 @@
 package com.devon.flashsale.service;
 
+import com.devon.flashsale.dto.EventResponseDto;
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.enums.EventStatus;
 import com.devon.flashsale.exceptions.ResourceNotFoundException;
@@ -44,7 +45,7 @@ public class EventServiceTest {
         event.setStatus(EventStatus.ACTIVE);
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        Event result = eventServiceImpl.getEventById(1L);
+        EventResponseDto result = eventServiceImpl.getEventById(1L);
         assertEquals("Concert", result.getEventName());
         assertEquals(50, result.getRemainingSeats());
     }

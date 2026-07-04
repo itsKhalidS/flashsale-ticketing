@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.devon.flashsale.config.FlashSaleMetricsConfig;
+import com.devon.flashsale.dto.OrderResponseDto;
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.entity.Order;
 import com.devon.flashsale.enums.EventStatus;
@@ -63,7 +64,7 @@ public class OrderServiceTest {
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-        Order created = orderServiceImpl.createOrder(1L, 2, "uniqueKey");
+        OrderResponseDto created = orderServiceImpl.createOrder(1L, 2, "uniqueKey");
 
         assertNotNull(created);
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -103,8 +104,11 @@ public class OrderServiceTest {
 
         when(orderRepository.findByIdempotencyKey("uniqueKey"))
                 .thenReturn(Optional.of(existing));
+        
+        OrderResponseDto existingDto = orderServiceImpl.convertToDto(existing);
 
-        Order result = orderServiceImpl.createOrder(1L, 2, "uniqueKey");
-        assertEquals(existing, result);
+        OrderResponseDto result = orderServiceImpl.createOrder(1L, 2, "uniqueKey");
+        
+        assertEquals(existingDto, result);
     }
 }

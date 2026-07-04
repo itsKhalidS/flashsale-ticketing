@@ -8,6 +8,10 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.devon.flashsale.config.FlashSaleMetricsConfig;
 import com.devon.flashsale.dto.OrderResponseDto;
+import com.devon.flashsale.dto.PageResponse;
 import com.devon.flashsale.dto.PaymentRequestDto;
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.entity.Order;
@@ -75,13 +80,16 @@ public class OrderServiceImpl implements OrderService {
 	    }
 	}
 	
-	private OrderResponseDto convertToDto(Order order) {
+	public OrderResponseDto convertToDto(Order order) {
 	    OrderResponseDto orderResponseDto = new OrderResponseDto();
 	    orderResponseDto.setOrderId(order.getOrderId());
 	    orderResponseDto.setEventId(order.getEvent().getEventId());
 	    orderResponseDto.setEventName(order.getEvent().getEventName());
+	    orderResponseDto.setEventDescription(order.getEvent().getDescription());
+	    orderResponseDto.setEventStatus(order.getEvent().getStatus());
+	    orderResponseDto.setEventImageUrl(order.getEvent().getImageUrl());
 	    orderResponseDto.setQuantity(order.getQty());
-	    orderResponseDto.setStatus(order.getStatus());
+	    orderResponseDto.setOrderStatus(order.getStatus());
 	    if(order.getPayment() != null) {
 	    	orderResponseDto.setPaymentReference(order.getPayment().getPaymentReference());
 	    }
@@ -92,10 +100,55 @@ public class OrderServiceImpl implements OrderService {
 	    return orderResponseDto;
 	}
 	
+	public PageResponse<OrderResponseDto> convertDbPageResponseToDto(Page<Order> pageResponseFromDb){
+		PageResponse<OrderResponseDto> response = new PageResponse<>();
+
+		response.setContent(pageResponseFromDb.getContent().stream().map(this::convertToDto).toList());
+		response.setPage(pageResponseFromDb.getNumber());
+		response.setSize(pageResponseFromDb.getSize());
+		response.setTotalElements(pageResponseFromDb.getTotalElements());
+		response.setTotalPages(pageResponseFromDb.getTotalPages());
+		response.setFirst(pageResponseFromDb.isFirst());
+		response.setLast(pageResponseFromDb.isLast());
+		
+		return response;
+	}
+	
 	@Override
 	@PreAuthorize("hasRole('ADMIN')")
-	public List<OrderResponseDto> getAllOrders() {
-		return orderRepository.findAll().stream().map(this::convertToDto).toList();
+	public PageResponse<OrderResponseDto> getAllOrders(int page, int size, String sortBy, String direction) {
+		if (page < 0) {
+	        throw new IllegalArgumentException("Page number cannot be negative.");
+	    }
+	    if (size <= 0 || size > 50) {
+	        throw new IllegalArgumentException("Page size must be between 1 and 50.");
+	    }
+	    Sort sort = direction.equalsIgnoreCase("desc")
+	            ? Sort.by(sortBy).descending()
+	            : Sort.by(sortBy).ascending();
+	    
+	    Pageable pageable = PageRequest.of(page, size, sort);
+	    Page<Order> pageResponseFromDb = orderRepository.findAll(pageable);
+		return convertDbPageResponseToDto(pageResponseFromDb);
+	}
+	
+	@Override
+	public PageResponse<OrderResponseDto> getMyOrders(int page, int size, String sortBy, String direction) {
+		if (page < 0) {
+	        throw new IllegalArgumentException("Page number cannot be negative.");
+	    }
+	    if (size <= 0 || size > 50) {
+	        throw new IllegalArgumentException("Page size must be between 1 and 50.");
+	    }
+
+		User currentUser = getCurrentUser();
+	    Sort sort = direction.equalsIgnoreCase("desc")
+	            ? Sort.by(sortBy).descending()
+	            : Sort.by(sortBy).ascending();
+	    
+	    Pageable pageable = PageRequest.of(page, size, sort);
+	    Page<Order> pageResponseFromDb = orderRepository.findByUser(currentUser, pageable);
+		return convertDbPageResponseToDto(pageResponseFromDb);
 	}
 	
 	@Override
@@ -105,14 +158,6 @@ public class OrderServiceImpl implements OrderService {
 		log.info("Order with Order Id: {} found", order.getOrderId());
 		validateOrderAccess(order);
 		return convertToDto(order);
-	}
-	
-	@Override
-	public List<OrderResponseDto> getMyOrders() {
-		User currentUser = getCurrentUser();
-	    List<Order> orders = orderRepository.findByUser(currentUser);
-
-	    return orders.stream().map(this::convertToDto).toList();
 	}
 	
 	@Override
