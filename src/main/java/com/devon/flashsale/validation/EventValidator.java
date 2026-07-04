@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.devon.flashsale.entity.Event;
 import com.devon.flashsale.enums.EventStatus;
-import com.devon.flashsale.exceptions.FileStorageException;
 import com.devon.flashsale.exceptions.FlashSaleAppException;
 import com.devon.flashsale.exceptions.ValidationException;
 
@@ -60,14 +58,6 @@ public class EventValidator {
 			
 		}
 		
-		return exceptions;
-	}
-	
-	public static List<FileStorageException> validateEventImage(MultipartFile file){
-		List<FileStorageException> exceptions = new ArrayList<>();
-		if (file == null || file.isEmpty()) {
-            exceptions.add(new FileStorageException("Image cannot be empty"));
-        }
 		return exceptions;
 	}
 }

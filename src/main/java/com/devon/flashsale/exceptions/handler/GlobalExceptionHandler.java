@@ -12,6 +12,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.devon.flashsale.dto.ErrorResponseDto;
 import com.devon.flashsale.exceptions.FileStorageException;
@@ -79,11 +80,19 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ErrorResponseDto> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+		log.error("Image size must not exceed 5 MB.", ex);
+		ErrorResponseDto erd = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "Image size must not exceed 5 MB."
+	    );
+	    return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(FileStorageException.class)
 	public ResponseEntity<ErrorResponseDto> handleFileStorageException(FileStorageException ex) {
 		log.error(ex.getMessage(), ex);
-		ErrorResponseDto erd = new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value() , ex.getMessage());
-		return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.INTERNAL_SERVER_ERROR);
+		ErrorResponseDto erd = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value() , ex.getMessage());
+		return new ResponseEntity<ErrorResponseDto>(erd, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(FlashSaleAppException.class)

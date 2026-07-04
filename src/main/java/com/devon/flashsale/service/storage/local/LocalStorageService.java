@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devon.flashsale.exceptions.FileStorageException;
 import com.devon.flashsale.service.storage.StorageService;
-import com.devon.flashsale.validation.EventValidator;
+import com.devon.flashsale.validation.ImageValidator;
 
 import jakarta.annotation.PostConstruct;
 
@@ -42,7 +42,7 @@ public class LocalStorageService implements StorageService {
 	
 	@Override
 	public String uploadEventImage(MultipartFile file) {
-		List<FileStorageException> exceptions = EventValidator.validateEventImage(file);
+		List<FileStorageException> exceptions = ImageValidator.validate(file);
 		if(exceptions.size() > 0) {
 			throw exceptions.get(0);
 		}
