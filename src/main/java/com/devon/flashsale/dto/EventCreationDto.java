@@ -1,5 +1,6 @@
 package com.devon.flashsale.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,16 @@ public class EventCreationDto {
 
     @NotNull
     private LocalDateTime endTime;
+    
+    @NotNull
+    private BigDecimal price;
+
+    @NotNull
+    private LocalDateTime eventDate;
+
+    @NotNull
+    @Size(max = 100, message = "Event venue length exceeded")
+    private String venue;
 
 	public String getEventName() {
 		return eventName;
@@ -61,6 +72,28 @@ public class EventCreationDto {
 		this.endTime = endTime;
 	}
 
-    // getters & setters
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public LocalDateTime getEventDate() {
+		return eventDate;
+	}
+
+	public void setEventDate(LocalDateTime eventDate) {
+		this.eventDate = eventDate;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
 
 }

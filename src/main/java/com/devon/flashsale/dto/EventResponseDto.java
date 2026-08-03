@@ -1,5 +1,6 @@
 package com.devon.flashsale.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.devon.flashsale.enums.EventStatus;
@@ -23,6 +24,12 @@ public class EventResponseDto {
     private EventStatus status;
 
     private String imageUrl;
+    
+    private BigDecimal price;
+
+    private LocalDateTime eventDate;
+
+    private String venue;
 
 	public Long getEventId() {
 		return eventId;
@@ -96,5 +103,28 @@ public class EventResponseDto {
 		this.imageUrl = imageUrl;
 	}
 
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public LocalDateTime getEventDate() {
+		return eventDate;
+	}
+
+	public void setEventDate(LocalDateTime eventDate) {
+		this.eventDate = eventDate;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
     
 }

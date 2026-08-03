@@ -48,6 +48,9 @@ public class EventServiceImpl implements EventService {
 		event.setTotalSeats(eventDto.getTotalSeats());
 		event.setStartTime(eventDto.getStartTime());
 		event.setEndTime(eventDto.getEndTime());
+		event.setPrice(eventDto.getPrice());
+		event.setEventDate(eventDto.getEventDate());
+		event.setVenue(eventDto.getVenue());
 		return event;
 	}
 	
@@ -62,6 +65,9 @@ public class EventServiceImpl implements EventService {
 		eventDto.setEndTime(event.getEndTime());
 		eventDto.setStatus(event.getStatus());
 		eventDto.setImageUrl(event.getImageUrl());
+		eventDto.setPrice(event.getPrice());
+		eventDto.setEventDate(event.getEventDate());
+		eventDto.setVenue(event.getVenue());
 		return eventDto;
 	}
 		

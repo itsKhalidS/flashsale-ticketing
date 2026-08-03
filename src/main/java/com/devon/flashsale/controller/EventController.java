@@ -26,7 +26,7 @@ public class EventController {
 	
 	private static final Logger log = LoggerFactory.getLogger(EventController.class);
 	
-	private static final int pageSize = 10;
+	private static final int pageSize = 12;
 	private static final String sortBy = "startTime";
 	private static final String sortDirection = "asc";
 	

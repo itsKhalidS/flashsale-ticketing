@@ -30,7 +30,7 @@ public class OrderController {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 	
-	private static final int pageSize = 10;
+	private static final int pageSize = 12;
 	private static final String sortBy = "createdAt";
 	private static final String sortDirection = "desc";
 	

@@ -1,5 +1,6 @@
 package com.devon.flashsale.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,8 +60,17 @@ public class Event extends BaseEntity {
     
     @Column(name = "image_url", length = 1000)
     private String imageUrl;
+    
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
 
-    @OneToMany(mappedBy = "event",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @Column(name = "event_date", nullable = false, length = 100)
+    private LocalDateTime eventDate;
+
+    @Column(name = "venue", nullable = false)
+    private String venue;
+
+	@OneToMany(mappedBy = "event",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Order> orders;
 
 	public Long getEventId() {
@@ -141,6 +151,30 @@ public class Event extends BaseEntity {
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+    public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public LocalDateTime getEventDate() {
+		return eventDate;
+	}
+
+	public void setEventDate(LocalDateTime eventDate) {
+		this.eventDate = eventDate;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
 	}
 
 	public List<Order> getOrders() {

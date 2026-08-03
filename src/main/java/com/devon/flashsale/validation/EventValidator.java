@@ -1,5 +1,6 @@
 package com.devon.flashsale.validation;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,10 @@ public class EventValidator {
 			exceptions.add(new ValidationException("Event name is required"));
 		}
 		
+		if(StringUtils.isEmpty(event.getVenue())){
+			exceptions.add(new ValidationException("Event venue is required"));
+		}
+		
 		if(event.getTotalSeats() == null) {
 			exceptions.add(new ValidationException("Total seats is required"));
 		}else if(event.getTotalSeats() < 0){
@@ -38,13 +43,25 @@ public class EventValidator {
 			event.setRemainingSeats(event.getTotalSeats());
 		}
 		
+		if(event.getPrice().compareTo(BigDecimal.ZERO) < 0 ){
+			exceptions.add(new ValidationException("Price cannot be negative"));
+		}
+		
+		if(event.getEventDate()==null) {
+			exceptions.add(new ValidationException("Event Date is required"));
+		}else {
+			if(event.getEventDate().isBefore(event.getStartTime())) {
+				exceptions.add(new ValidationException("Event Date should be after Start time"));
+			}
+		}
+		
 		if(event.getStartTime()==null) {
-			exceptions.add(new ValidationException("Event start time is required"));
+			exceptions.add(new ValidationException("Start time is required"));
 		}else if(event.getEndTime()==null) {
-			exceptions.add(new ValidationException("Event end time is required"));
+			exceptions.add(new ValidationException("End time is required"));
 		}else {
 			if(event.getStartTime().isEqual(event.getEndTime()) || event.getStartTime().isAfter(event.getEndTime())) {
-				exceptions.add(new ValidationException("Event start time should be before Event end time"));
+				exceptions.add(new ValidationException("Start time should be before End time"));
 			}
 			if(currentDateTime.isAfter(event.getEndTime())) {
 				exceptions.add(new ValidationException("Cannot add an event which has already ended"));
